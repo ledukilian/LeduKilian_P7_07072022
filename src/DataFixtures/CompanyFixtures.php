@@ -4,35 +4,46 @@ namespace App\DataFixtures;
 use App\Entity\Company;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class CompanyFixtures extends Fixture
 {
     public const COMPANY1_REFERENCE = 'company-1';
     public const COMPANY2_REFERENCE = 'company-2';
     public const COMPANY3_REFERENCE = 'company-3';
+    public const DEFAULT_PASSWORD = 'bilemo';
+    private UserPasswordHasherInterface $hasher;
+
+    public function __construct(UserPasswordHasherInterface $hasher)
+    {
+        $this->hasher = $hasher;
+    }
 
     public function load(ObjectManager $manager): void
     {
         /*  Creating first Company */
         $company01 = new Company();
-        $company01->setEmail('admin@bilemo.fr');
-        $company01->setPassword('$2y$13$pnXVA1WXxikRzYkc41FYPuyhVA4Dcv57uOjP9bAgQuRr8aXVHY17q');
-        $company01->setRoles(["ROLE_ADMIN"]);
         $company01->setName('Bilemo SAS');
+        $company01->setEmail('admin@bilemo.fr');
+        $password = $this->hasher->hashPassword($company01, self::DEFAULT_PASSWORD);
+        $company01->setPassword($password);
+        $company01->setRoles(["ROLE_ADMIN"]);
 
         /*  Creating second Company */
         $company02 = new Company();
-        $company02->setEmail('anna.rtichaud@acompany.fr');
-        $company02->setPassword('$2y$13$pnXVA1WXxikRzYkc41FYPuyhVA4Dcv57uOjP9bAgQuRr8aXVHY17q');
-        $company02->setRoles([""]);
         $company02->setName('A-Company');
+        $company02->setEmail('anna.rtichaud@acompany.fr');
+        $password = $this->hasher->hashPassword($company02, self::DEFAULT_PASSWORD);
+        $company02->setPassword($password);
+        $company02->setRoles([""]);
 
         /*  Creating third Company */
         $company03 = new Company();
-        $company03->setEmail('yves.atroloin@snowtricks.fr');
-        $company03->setPassword('$2y$13$pnXVA1WXxikRzYkc41FYPuyhVA4Dcv57uOjP9bAgQuRr8aXVHY17q');
+        $company03->setName('B Corp');
+        $company03->setEmail('yves.atroloin@b-corp.fr');
+        $password = $this->hasher->hashPassword($company03, self::DEFAULT_PASSWORD);
+        $company03->setPassword($password);
         $company03->setRoles([""]);
-        $company03->setName('Snowtricks Blog');
 
 
         $manager->persist($company01);
