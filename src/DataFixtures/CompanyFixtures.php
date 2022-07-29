@@ -32,7 +32,7 @@ class CompanyFixtures extends Fixture
         /*  Creating second Company */
         $company02 = new Company();
         $company02->setName('A-Company');
-        $company02->setEmail('anna.rtichaud@acompany.fr');
+        $company02->setEmail('admin@acompany.com');
         $password = $this->hasher->hashPassword($company02, self::DEFAULT_PASSWORD);
         $company02->setPassword($password);
         $company02->setRoles([""]);
@@ -40,7 +40,7 @@ class CompanyFixtures extends Fixture
         /*  Creating third Company */
         $company03 = new Company();
         $company03->setName('B Corp');
-        $company03->setEmail('yves.atroloin@b-corp.fr');
+        $company03->setEmail('admin@b-corp.fr');
         $password = $this->hasher->hashPassword($company03, self::DEFAULT_PASSWORD);
         $company03->setPassword($password);
         $company03->setRoles([""]);
