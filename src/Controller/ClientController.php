@@ -4,6 +4,8 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Entity\Company;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,14 +18,14 @@ use Symfony\Component\Serializer\Serializer;
 class ClientController extends AbstractController
 {
     /**
-     * @Route("/company/{company_id}/clients/", name="show_clients")
-     * @param ManagerRegistry $doctrine
-     * @param int             $id
+     * @Route("/company/{company_id}/clients/", name="getClients")
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param int                 $company
      * @return Response
      */
-    public function showClients(ManagerRegistry $doctrine, int $company_id): Response
+    public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, int $company_id): Response
     {
-        /* Get company */
         $company = $doctrine
             ->getRepository(Company::class)
             ->findBy(
@@ -41,14 +43,23 @@ class ClientController extends AbstractController
                 ]
             );
 
-        $encoders = [new XmlEncoder(), new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
 
-        $serializer = new Serializer($normalizers, $encoders);
+        $context = SerializationContext::create()->setGroups(['getClients']);
+        $clients = $serializer->serialize($clients, 'json', $context);
 
-        $clients = $serializer->normalize($clients, null, [
-            AbstractNormalizer::ATTRIBUTES => ['id', 'email', 'firstname', 'lastname', 'company' => ['email', 'name']]
-        ]);
+
+        return $this->json([$clients], 204, [], []);
+        die;
+
+        //$encoders = [new XmlEncoder(), new JsonEncoder()];
+        //$normalizers = [new ObjectNormalizer()];
+        //$serializer = new Serializer($normalizers, $encoders);
+        //$clients = $serializer->normalize($clients, null, [
+        //    AbstractNormalizer::ATTRIBUTES => ['id', 'email', 'firstname', 'lastname', 'company' => ['email', 'name']]
+        //]);
+
+
+
 
         if (sizeof($clients)>0) {
             return $this->json([
@@ -62,7 +73,7 @@ class ClientController extends AbstractController
 
 
     /**
-     * @Route("/company/{company_id}/clients/{client_id}/", name="show_client")
+     * @Route("/company/{company_id}/clients/{client_id}/", name="getClient")
      * @param ManagerRegistry $doctrine
      * @param int             $id
      * @return Response
