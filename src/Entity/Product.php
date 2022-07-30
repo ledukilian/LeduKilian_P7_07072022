@@ -4,25 +4,44 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use Hateoas\Configuration\Annotation as Hateoas;
 
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "getProduct",
+ *          parameters = { "product" = "expr(object.getId())" },
+ *          absolute=true
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getProducts")
+ * )
+ *
+ */
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["getProducts", "getProduct"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getProducts", "getProduct"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getProducts", "getProduct"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getProducts", "getProduct"])]
     private ?string $brand = null;
 
     #[ORM\Column]
+    #[Groups(["getProducts", "getProduct"])]
     private ?float $price = null;
 
     public function getId(): ?int
