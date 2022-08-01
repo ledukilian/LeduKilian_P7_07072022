@@ -13,17 +13,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractController
 {
     /**
-     * @Route("/api/products/", name="getProducts")
+     * @Route("/api/products/{limit}/{offset}", name="getProducts")
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
+     * @param int                 $limit
+     * @param int                 $offset
      * @return JsonResponse
      */
-    public function showProducts(ManagerRegistry $doctrine, SerializerInterface $serializer): JsonResponse
+    public function showProducts(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
         /* Get all products */
         $products = $doctrine
             ->getRepository(Product::class)
-            ->findAll();
+            ->findBy(
+                [],
+                [],
+                $limit,
+                $offset
+            );
 
         /* Serialisation */
         $context = SerializationContext::create()->setGroups(['getProducts']);
