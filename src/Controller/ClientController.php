@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -18,104 +19,77 @@ use Symfony\Component\Serializer\Serializer;
 class ClientController extends AbstractController
 {
     /**
-     * @Route("/company/{company_id}/clients/", name="getClients")
+     * @Route("/api/company/{company}/clients/", name="getClients")
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param int                 $company
-     * @return Response
+     * @param Company             $company
+     * @return JsonResponse
      */
-    public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, int $company_id): Response
+    public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, Company $company): JsonResponse
     {
-        $company = $doctrine
-            ->getRepository(Company::class)
-            ->findBy(
-                [
-                    'id' => $company_id
-                ]
-            );
+        /* Check permission */
+        if ($this->getUser()->getId()!==$company->getId()) {
+            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+        }
 
         /* Get all clients */
         $clients = $doctrine
             ->getRepository(Client::class)
             ->findBy(
                 [
-                    'company' => $company
+                    'company' => $this->getUser()
                 ]
             );
 
-
+        /* Serialisation */
         $context = SerializationContext::create()->setGroups(['getClients']);
-        $clients = $serializer->serialize($clients, 'json', $context);
+        $clients_json = $serializer->serialize($clients, 'json', $context);
 
-
-        return $this->json([$clients], 204, [], []);
-        die;
-
-        //$encoders = [new XmlEncoder(), new JsonEncoder()];
-        //$normalizers = [new ObjectNormalizer()];
-        //$serializer = new Serializer($normalizers, $encoders);
-        //$clients = $serializer->normalize($clients, null, [
-        //    AbstractNormalizer::ATTRIBUTES => ['id', 'email', 'firstname', 'lastname', 'company' => ['email', 'name']]
-        //]);
-
-
-
-
+        /* Return conditions */
         if (sizeof($clients)>0) {
-            return $this->json([
-                'success' => true,
-                'clients' => $clients
-            ], 200, [], []);
+            return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
         } else {
-            return $this->json([], 204, [], []);
+            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
         }
+
     }
 
 
     /**
-     * @Route("/company/{company_id}/clients/{client_id}/", name="getClient")
+     * @Route("/api/clients/{client}/", name="getClient")
      * @param ManagerRegistry $doctrine
-     * @param int             $id
+     * @param int             $client
      * @return Response
      */
-    public function showClient(ManagerRegistry $doctrine, int $company_id, int $client_id): Response
+    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): Response
     {
-        /* Get company */
-        $company = $doctrine
-            ->getRepository(Company::class)
-            ->findBy(
-                [
-                    'id' => $company_id
-                ]
-            );
-
-        /* Get all clients */
+        /* Get client information */
         $client = $doctrine
             ->getRepository(Client::class)
             ->findBy(
                 [
-                    'company' => $company,
-                    'id' => $client_id
+                    'id' => $client
                 ]
-            );
+            )
+            ;
 
-        $encoders = [new XmlEncoder(), new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-
-        $serializer = new Serializer($normalizers, $encoders);
-
-        $client = $serializer->normalize($client, null, [
-            AbstractNormalizer::ATTRIBUTES => ['id', 'email', 'firstname', 'lastname', 'company' => ['email', 'name']]
-        ]);
-
-        if (sizeof($client)>0) {
-            return $this->json([
-                'success' => true,
-                'client' => $client
-            ], 200, [], []);
-        } else {
-            return $this->json([], 204, [], []);
+        /* Check if we have 1 client */
+        if (sizeof($client)==0)  {
+            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
         }
+
+        /* Check permission */
+        if ($this->getUser()->getId()!==$client[0]->getCompany()->getId()) {
+            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+        }
+
+        /* Serialisation */
+        $context = SerializationContext::create()->setGroups(['getClient']);
+        $client_json = $serializer->serialize($client[0], 'json', $context);
+
+        /* Return content */
+        return new JsonResponse($client_json, Response::HTTP_OK, [], true);
+
     }
 
 }

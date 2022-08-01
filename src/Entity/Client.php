@@ -5,15 +5,17 @@ namespace App\Entity;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
-
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @Hateoas\Relation(
  *      "self",
  *      href = @Hateoas\Route(
  *          "getClient",
- *          parameters = { "id" = "expr(object.getId())" }
- *      )
+ *          parameters = { "client" = "expr(object.getId())" },
+ *          absolute=true
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getClients")
  * )
  *
  */
@@ -23,19 +25,24 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
+    #[Groups(["getClients", "getClient"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["getClients", "getClient"])]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getClients", "getClient"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getClients", "getClient"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getClients", "getClient"])]
     private ?string $lastname = null;
 
     public function getId(): ?int
