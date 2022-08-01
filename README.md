@@ -34,6 +34,6 @@ You can use initial fixtures dataset with `php bin/console doctrine:fixtures:loa
 If you use the fixtures, you can use one of the 3 default company account :
 
 - [ ] `admin@bilemo.fr` | `bilemo`
-- [ ] `yves.atroloin@b-corp.fr` | `bilemo`
-- [ ] `anna.rtichaud@acompany.fr` | `bilemo`
+- [ ] `admin@acompany.com` | `bilemo`
+- [ ] `admin@b-corp.fr` | `bilemo`
 
