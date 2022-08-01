@@ -20,26 +20,25 @@ use Symfony\Component\Serializer\Serializer;
 class ClientController extends AbstractController
 {
     /**
-     * @Route("/api/company/{company}/clients/", name="getClients")
+     * @Route("/api/company/clients/{limit}/{offset}", name="getClients")
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param Company             $company
+     * @param int                 $limit
+     * @param int                 $offset
      * @return JsonResponse
      */
-    public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, Company $company): JsonResponse
+    public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
-        /* Check permission */
-        if ($this->getUser()->getId()!==$company->getId()) {
-            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
-        }
-
         /* Get all clients */
         $clients = $doctrine
             ->getRepository(Client::class)
             ->findBy(
                 [
                     'company' => $this->getUser()
-                ]
+                ],
+                [],
+                $limit,
+                $offset
             );
 
         /* Serialisation */
@@ -64,7 +63,7 @@ class ClientController extends AbstractController
     public function addClient(ManagerRegistry $doctrine, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        if (!array_key_exists('email', $data) || filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if (!array_key_exists('email', $data)) {
             return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
         }
         if (!array_key_exists('firstname', $data)) {
@@ -138,7 +137,7 @@ class ClientController extends AbstractController
         /* Get client information */
         $client = $doctrine
             ->getRepository(Client::class)
-            ->findBy(
+            ->findOneBy(
                 [
                     'id' => $client
                 ]
@@ -146,18 +145,18 @@ class ClientController extends AbstractController
             ;
 
         /* Check if we have 1 client */
-        if (sizeof($client)==0)  {
+        if (!$client)  {
             return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
         }
 
         /* Check permission */
-        if ($this->getUser()->getId()!==$client[0]->getCompany()->getId()) {
+        if ($this->getUser()->getId()!==$client->getCompany()->getId()) {
             return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
         }
 
         /* Serialisation */
         $context = SerializationContext::create()->setGroups(['getClient']);
-        $client_json = $serializer->serialize($client[0], 'json', $context);
+        $client_json = $serializer->serialize($client, 'json', $context);
 
         /* Return content */
         return new JsonResponse($client_json, Response::HTTP_OK, [], true);
