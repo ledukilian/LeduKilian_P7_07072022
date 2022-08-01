@@ -25,11 +25,13 @@ class ProductController extends AbstractController
             ->getRepository(Product::class)
             ->findAll();
 
+        /* Serialisation */
         $context = SerializationContext::create()->setGroups(['getProducts']);
-        $products = $serializer->serialize($products, 'json', $context);
+        $products_json = $serializer->serialize($products, 'json', $context);
 
+        /* Return conditions*/
         if (!empty($products)) {
-            return new JsonResponse($products, Response::HTTP_OK, [], true);
+            return new JsonResponse($products_json, Response::HTTP_OK, [], true);
         } else {
             return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
         }
@@ -44,6 +46,7 @@ class ProductController extends AbstractController
      */
     public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, int $product): JsonResponse
     {
+        /* Get one product */
         $product = $doctrine
             ->getRepository(Product::class)
             ->findBy(
@@ -52,10 +55,11 @@ class ProductController extends AbstractController
                 ]
             );
 
-        /* Get one product */
+        /* Serialisation */
         $context = SerializationContext::create()->setGroups(['getProduct']);
         $product_json = $serializer->serialize($product, 'json', $context);
 
+        /* Return conditions */
         if (sizeof($product)>0) {
             return new JsonResponse($product_json, Response::HTTP_OK, [], true);
         } else {
