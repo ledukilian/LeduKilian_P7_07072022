@@ -8,6 +8,7 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -54,14 +55,51 @@ class ClientController extends AbstractController
 
     }
 
+    /**
+     * @Route("/api/clients/add/", name="addClient")
+     * @param ManagerRegistry $doctrine
+     * @param Request         $request
+     * @return JsonResponse
+     */
+    public function addClient(ManagerRegistry $doctrine, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!array_key_exists('email', $data) || filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
+        }
+        if (!array_key_exists('firstname', $data)) {
+            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
+        }
+        if (!array_key_exists('lastname', $data)) {
+            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
+        }
+
+        // TODO : Ajouter des vérifications sur l'email etc..
+
+        $client = new Client();
+        $client->setEmail($data['email']);
+        $client->setFirstname($data['firstname']);
+        $client->setLastname($data['lastname']);
+        $client->setCompany($this->getUser());
+
+        /* Persist the entity into the database */
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($client);
+        $entityManager->flush();
+
+        /* Return response */
+        return new JsonResponse("", Response::HTTP_CREATED, [], true);
+    }
+
 
     /**
      * @Route("/api/clients/{client}/", name="getClient")
-     * @param ManagerRegistry $doctrine
-     * @param int             $client
-     * @return Response
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param int                 $client
+     * @return JsonResponse
      */
-    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): Response
+    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): JsonResponse
     {
         /* Get client information */
         $client = $doctrine
@@ -91,5 +129,6 @@ class ClientController extends AbstractController
         return new JsonResponse($client_json, Response::HTTP_OK, [], true);
 
     }
+
 
 }
