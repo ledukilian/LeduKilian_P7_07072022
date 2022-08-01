@@ -91,6 +91,40 @@ class ClientController extends AbstractController
         return new JsonResponse("", Response::HTTP_CREATED, [], true);
     }
 
+    /**
+     * @Route("/api/clients/{client}/delete/", name="deleteClient")
+     * @param ManagerRegistry $doctrine
+     * @param int             $client
+     * @return JsonResponse
+     */
+    public function deleteClient(ManagerRegistry $doctrine, int $client): JsonResponse
+    {
+        /* Get client information */
+        $client = $doctrine
+            ->getRepository(Client::class)
+            ->findOneBy(
+                [
+                    'id' => $client
+                ]
+            )
+        ;
+        if (!$client) {
+            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+        }
+
+        /* Check permission */
+        if ($this->getUser()->getId()!==$client->getCompany()->getId()) {
+            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+        }
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->remove($client);
+        $entityManager->flush();
+
+        /* Return response */
+        return new JsonResponse("", Response::HTTP_ACCEPTED, [], true);
+    }
+
 
     /**
      * @Route("/api/clients/{client}/", name="getClient")
