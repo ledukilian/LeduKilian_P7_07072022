@@ -17,6 +17,15 @@ use JMS\Serializer\Annotation\Groups;
  *      ),
  *      exclusion = @Hateoas\Exclusion(groups="getClients")
  * )
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "deleteClient",
+ *          parameters = { "client" = "expr(object.getId())" },
+ *          absolute=true
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getClients")
+ * )
  *
  */
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
