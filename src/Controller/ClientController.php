@@ -11,11 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 class ClientController extends AbstractController
 {
@@ -45,6 +40,8 @@ class ClientController extends AbstractController
         $context = SerializationContext::create()->setGroups(['getClients']);
         $clients_json = $serializer->serialize($clients, 'json', $context);
 
+        // Page actuelle
+
         /* Return conditions */
         if (sizeof($clients)>0) {
             return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
@@ -55,31 +52,21 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/api/clients/add/", name="addClient")
-     * @param ManagerRegistry $doctrine
-     * @param Request         $request
+     * @Route("/api/clients/add/", name="addClient", methods={"POST"})
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param Request             $request
      * @return JsonResponse
      */
-    public function addClient(ManagerRegistry $doctrine, Request $request): JsonResponse
+    public function addClient(ManagerRegistry $doctrine, SerializerInterface $serializer, Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        if (!array_key_exists('email', $data)) {
-            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
-        }
-        if (!array_key_exists('firstname', $data)) {
-            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
-        }
-        if (!array_key_exists('lastname', $data)) {
-            return new JsonResponse("", Response::HTTP_UNPROCESSABLE_ENTITY, [], true);
-        }
+        $client = $serializer->deserialize($request->getContent(), Client::class, "json");
 
-        // TODO : Ajouter des vérifications sur l'email etc..
+        dd($client);
 
-        $client = new Client();
-        $client->setEmail($data['email']);
-        $client->setFirstname($data['firstname']);
-        $client->setLastname($data['lastname']);
         $client->setCompany($this->getUser());
+
+        dd($client);
 
         /* Persist the entity into the database */
         $entityManager = $doctrine->getManager();
@@ -87,7 +74,7 @@ class ClientController extends AbstractController
         $entityManager->flush();
 
         /* Return response */
-        return new JsonResponse("", Response::HTTP_CREATED, [], true);
+        return new JsonResponse($client, Response::HTTP_OK, [], true);
     }
 
     /**

@@ -18,7 +18,7 @@ use JMS\Serializer\Annotation\Groups;
  *      exclusion = @Hateoas\Exclusion(groups="getClients")
  * )
  * @Hateoas\Relation(
- *      "self",
+ *      "delete",
  *      href = @Hateoas\Route(
  *          "deleteClient",
  *          parameters = { "client" = "expr(object.getId())" },
