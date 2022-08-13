@@ -64,12 +64,10 @@ class ClientVoter extends Voter
         switch ($attribute) {
             case self::LIST:
                 return true;
-            case self::DETAILS:
-                return $this->canShowDetails($client, $company);
             case self::ADD:
-                return $this->canAdd($client, $company);
             case self::REMOVE:
-                return $this->canRemove($client, $company);
+            case self::DETAILS:
+                return $this->isPartOf($client, $company);
         }
         throw new \LogicException('This code should not be reached!');
     }
@@ -79,33 +77,7 @@ class ClientVoter extends Voter
      * @param Company $company
      * @return bool
      */
-    private function canShowDetails(Client $client, Company $company): bool
-    {
-        if ($company->getId()!==$client->getCompany()->getId()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param Client  $client
-     * @param Company $company
-     * @return bool
-     */
-    private function canAdd(Client $client, Company $company): bool
-    {
-        if ($company->getId()!==$client->getCompany()->getId()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param Client  $client
-     * @param Company $company
-     * @return bool
-     */
-    private function canRemove(Client $client, Company $company): bool
+    private function isPartOf(Client $client, Company $company): bool
     {
         if ($company->getId()!==$client->getCompany()->getId()) {
             return false;
