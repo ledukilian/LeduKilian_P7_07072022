@@ -37,11 +37,7 @@ class ProductController extends AbstractController
         $products_json = $serializer->serialize($products, 'json', $context);
 
         /* Return conditions*/
-        if (!empty($products)) {
-            return new JsonResponse($products_json, Response::HTTP_OK, [], true);
-        } else {
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
-        }
+        return new JsonResponse($products_json, Response::HTTP_OK, [], true);
     }
 
     /**
@@ -67,10 +63,9 @@ class ProductController extends AbstractController
         $product_json = $serializer->serialize($product, 'json', $context);
 
         /* Return conditions */
-        if (sizeof($product)>0) {
-            return new JsonResponse($product_json, Response::HTTP_OK, [], true);
-        } else {
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+        if (!$product)  {
+            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
         }
+        return new JsonResponse($product_json, Response::HTTP_OK, [], true);
     }
 }
