@@ -34,24 +34,24 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["getClients", "getClient"])]
+    #[Groups(["getClient"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["getClients", "getClient"])]
+    #[Groups(["getClient"])]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClients", "getClient"])]
+    #[Groups(["getClient"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClients", "getClient"])]
+    #[Groups(["getClient"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClients", "getClient"])]
+    #[Groups(["getClient"])]
     private ?string $lastname = null;
 
     public function getId(): ?int
