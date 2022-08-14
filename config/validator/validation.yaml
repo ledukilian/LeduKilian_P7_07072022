@@ -1,0 +1,88 @@
+App\Entity\Client:
+  properties:
+    email:
+      - NotBlank: ~
+      - NotNull: ~
+      - Email:
+          message: 'The email "{{ value }}" is not a valid email.'
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The email must be at least {{ limit }} characters long'
+          maxMessage: 'The email cannot be longer than {{ limit }} characters'
+    firstname:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 75
+          minMessage: 'The first name must be at least {{ limit }} characters long'
+          maxMessage: 'The first name cannot be longer than {{ limit }} characters'
+    lastname:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 75
+          minMessage: 'The last name must be at least {{ limit }} characters long'
+          maxMessage: 'The last name cannot be longer than {{ limit }} characters'
+
+App\Entity\Company:
+  properties:
+    email:
+      - NotBlank: ~
+      - NotNull: ~
+      - Email:
+          message: 'The email "{{ value }}" is not a valid email.'
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The email must be at least {{ limit }} characters long'
+          maxMessage: 'The email cannot be longer than {{ limit }} characters'
+    password:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The password must be at least {{ limit }} characters long'
+          maxMessage: 'The password cannot be longer than {{ limit }} characters'
+    name:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 75
+          minMessage: 'The name must be at least {{ limit }} characters long'
+          maxMessage: 'The name cannot be longer than {{ limit }} characters'
+
+App\Entity\Product:
+  properties:
+    name:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 75
+          minMessage: 'The name must be at least {{ limit }} characters long'
+          maxMessage: 'The name cannot be longer than {{ limit }} characters'
+    description:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 255
+          minMessage: 'The description must be at least {{ limit }} characters long'
+          maxMessage: 'The description cannot be longer than {{ limit }} characters'
+    brand:
+      - NotBlank: ~
+      - NotNull: ~
+      - Length:
+          min: 2
+          max: 75
+          minMessage: 'The brand must be at least {{ limit }} characters long'
+          maxMessage: 'The brand cannot be longer than {{ limit }} characters'
+    price:
+      - NotBlank: ~
+      - NotNull: ~
+      - Positive: ~
