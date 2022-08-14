@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientController extends AbstractController
 {
@@ -40,41 +44,54 @@ class ClientController extends AbstractController
         $context = SerializationContext::create()->setGroups(['getClients']);
         $clients_json = $serializer->serialize($clients, 'json', $context);
 
-        // Page actuelle
+        // TODO : Gestion de la pagination
 
         /* Return conditions */
         if (sizeof($clients)>0) {
             return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
-        } else {
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
         }
 
     }
 
     /**
      * @Route("/api/clients/add/", name="addClient", methods={"POST"})
+     * @param ValidatorInterface  $validator
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
      * @param Request             $request
      * @return JsonResponse
      */
-    public function addClient(ManagerRegistry $doctrine, SerializerInterface $serializer, Request $request): JsonResponse
+    public function addClient(ValidatorInterface $validator, ManagerRegistry $doctrine, SerializerInterface $serializer, Request $request): JsonResponse
     {
         $client = $serializer->deserialize($request->getContent(), Client::class, "json");
-
-        dd($client);
-
         $client->setCompany($this->getUser());
 
-        dd($client);
+        $errors = $validator->validate($client);
 
-        /* Persist the entity into the database */
-        $entityManager = $doctrine->getManager();
-        $entityManager->persist($client);
-        $entityManager->flush();
+        if (count($errors) > 0) {
+            $errors = (string) $errors;
+            $errors_json = $serializer->serialize($errors, 'json');
 
-        /* Return response */
-        return new JsonResponse($client, Response::HTTP_OK, [], true);
+            return new JsonResponse($errors_json, Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        if ($this->isGranted('add_client', $client)) {
+
+            /* Persist the entity into the database */
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($client);
+            $entityManager->flush();
+
+            $context = SerializationContext::create()->setGroups(['getClient']);
+            $client_json = $serializer->serialize($client, 'json', $context);
+
+            /* Return response */
+            return new JsonResponse($client_json, Response::HTTP_CREATED, [], true);
+
+        } else {
+            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+        }
+
     }
 
     /**
@@ -95,20 +112,24 @@ class ClientController extends AbstractController
             )
         ;
         if (!$client) {
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
         }
 
         /* Check permission */
-        if ($this->getUser()->getId()!==$client->getCompany()->getId()) {
+        if ($this->isGranted('remove_client', $client)) {
+
+            $entityManager = $doctrine->getManager();
+            $entityManager->remove($client);
+            $entityManager->flush();
+
+            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+
+        } else {
+
             return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+
         }
 
-        $entityManager = $doctrine->getManager();
-        $entityManager->remove($client);
-        $entityManager->flush();
-
-        /* Return response */
-        return new JsonResponse("", Response::HTTP_ACCEPTED, [], true);
     }
 
 
@@ -133,20 +154,26 @@ class ClientController extends AbstractController
 
         /* Check if we have 1 client */
         if (!$client)  {
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
         }
 
         /* Check permission */
-        if ($this->getUser()->getId()!==$client->getCompany()->getId()) {
+        if ($this->isGranted('detail_client', $client)) {
+
+            /* Serialisation */
+            $context = SerializationContext::create()->setGroups(['getClient']);
+            $client_json = $serializer->serialize($client, 'json', $context);
+
+            /* Return content */
+            return new JsonResponse($client_json, Response::HTTP_OK, [], true);
+
+        } else {
+
             return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+
         }
 
-        /* Serialisation */
-        $context = SerializationContext::create()->setGroups(['getClient']);
-        $client_json = $serializer->serialize($client, 'json', $context);
 
-        /* Return content */
-        return new JsonResponse($client_json, Response::HTTP_OK, [], true);
 
     }
 
