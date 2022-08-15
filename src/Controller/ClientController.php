@@ -45,7 +45,7 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/api/clients/{client}/", name="getClient", methods={"GET"})
+     * @Route("/api/client/{client}/", name="getClient", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
      * @param int                 $client
@@ -131,7 +131,7 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/api/clients/{client}/delete/", name="deleteClient", methods={"POST", "DELETE"})
+     * @Route("/api/client/{client}/delete/", name="deleteClient", methods={"POST", "DELETE"})
      * @param ManagerRegistry $doctrine
      * @param int             $client
      * @return JsonResponse
