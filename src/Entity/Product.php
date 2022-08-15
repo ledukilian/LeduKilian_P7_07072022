@@ -15,7 +15,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *          parameters = { "product" = "expr(object.getId())" },
  *          absolute=true
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getProducts")
+ *      exclusion = @Hateoas\Exclusion(groups={"full_product"})
  * )
  *
  */
@@ -25,23 +25,23 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["getProducts", "getProduct"])]
+    #[Groups(["full_product"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getProducts", "getProduct"])]
+    #[Groups(["full_product"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getProducts", "getProduct"])]
+    #[Groups(["full_product"])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getProducts", "getProduct"])]
+    #[Groups(["full_product"])]
     private ?string $brand = null;
 
     #[ORM\Column]
-    #[Groups(["getProducts", "getProduct"])]
+    #[Groups(["full_product"])]
     private ?float $price = null;
 
     public function getId(): ?int

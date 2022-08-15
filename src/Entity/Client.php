@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation\Groups;
  *          parameters = { "client" = "expr(object.getId())" },
  *          absolute=true
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getClients")
+ *      exclusion = @Hateoas\Exclusion(groups={"full_client"})
  * )
  * @Hateoas\Relation(
  *      "delete",
@@ -24,7 +24,7 @@ use JMS\Serializer\Annotation\Groups;
  *          parameters = { "client" = "expr(object.getId())" },
  *          absolute=true
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getClients")
+ *      exclusion = @Hateoas\Exclusion(groups={"full_client"})
  * )
  *
  */
@@ -34,24 +34,24 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column()]
-    #[Groups(["getClient"])]
+    #[Groups(["full_client"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["getClient"])]
+    #[Groups(["full_client"])]
     private ?Company $company = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClient"])]
+    #[Groups(["full_client"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClient"])]
+    #[Groups(["full_client"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClient"])]
+    #[Groups(["full_client"])]
     private ?string $lastname = null;
 
     public function getId(): ?int

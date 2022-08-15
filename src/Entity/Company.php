@@ -28,7 +28,7 @@ class Company implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getClients"])]
+    #[Groups(["full_client"])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'company_id', targetEntity: Client::class)]
