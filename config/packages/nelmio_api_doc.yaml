@@ -1,9 +1,191 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
-            version: 1.0.0
+            title: "Bilemo App"
+            description: "Toute une sélection de téléphones mobiles haut de gamme !"
+            version: "1.0.0"
+        components:
+            schemas:
+                Company:
+                    required:
+                        - id
+                        - email
+                        - roles
+                        - password
+                        - name
+                    properties:
+                        id:
+                            type: integer
+                        email:
+                            type: string
+                        roles:
+                            type: json
+                        password:
+                            type: string
+                        name:
+                            type: string
+                    type: object
+                Product:
+                    required:
+                        - id
+                        - name
+                        - description
+                        - brand
+                        - price
+                    properties:
+                        id:
+                            type: integer
+                        name:
+                            type: string
+                        description:
+                            type: string
+                        brand:
+                            type: string
+                        price:
+                            type: float
+                    type: object
+                Client:
+                    required:
+                        - id
+                        - company_id
+                        - email
+                        - firstname
+                        - lastname
+                    properties:
+                        id:
+                            type: integer
+                        company_id:
+                            type: integer
+                        email:
+                            type: string
+                        firstname:
+                            type: string
+                        lastname:
+                            type: string
+                    type: object
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        paths:
+            '/api/products/{limit}/{offset}':
+                get:
+                    tags:
+                        - Produits
+                    summary: 'Récupérer la liste des produits'
+                    operationId: getProducts
+                    parameters:
+                        -
+                            name: product
+                            in: path
+                            description: 'Identifiant du produit à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Produit trouvé et retourné'
+                        default:
+                            description: 'unexpected error'
+
+            '/api/product/{product}/':
+                get:
+                    tags:
+                        - Produits
+                    summary: 'Récupérer les informations sur un produit spécifique'
+                    operationId: getProduct
+                    parameters:
+                        -
+                            name: product
+                            in: path
+                            description: 'Identifiant du produit à récupérer'
+                            required: true
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Produit trouvé et retourné'
+                        '404':
+                            description: 'Produit non trouvé'
+                        default:
+                            description: 'unexpected error'
+
+
+
+            '/api/clients/{limit}/{offset}':
+                get:
+                    tags:
+                        - Clients
+                    summary: 'Récupérer la liste des clients'
+                    operationId: getClients
+                    parameters:
+                        -
+                            name: product
+                            in: path
+                            description: 'Identifiant du produit à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Produit trouvé et retourné'
+                        default:
+                            description: 'unexpected error'
+
+            '/api/client/{client}/':
+                get:
+                    tags:
+                        - Clients
+                    summary: 'Récupérer les informations sur un client spécifique'
+                    operationId: getClient
+                    parameters:
+                        -
+                            name: client
+                            in: path
+                            description: 'Identifiant du client à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Client trouvé et retourné'
+            '/api/clients/add/':
+                post:
+                    tags:
+                        - Clients
+                    summary: 'Ajouter un client'
+                    operationId: addClient
+                    parameters:
+                        -
+                            name: client
+                            in: path
+                            description: 'Identifiant du client à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Client trouvé et retourné'
+            '/api/clients/{client}/delete/':
+                delete:
+                    tags:
+                        - Clients
+                    summary: 'Supprimer un client'
+                    operationId: deleteClient
+                    parameters:
+                        -
+                            name: client
+                            in: path
+                            description: 'Identifiant du client à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Client trouvé et retourné'
+
+
     areas:
         path_patterns: # an array of regexps (document only routes under /api, except /api/doc)
             - ^/api(?!/doc$)
