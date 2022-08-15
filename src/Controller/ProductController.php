@@ -3,57 +3,71 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Services\PaginationService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 class ProductController extends AbstractController
 {
     /**
-     * @Route("/products/", name="show_products")
-     * @param ManagerRegistry $doctrine
-     * @return Response
+     * @Route("/api/products/{limit}/{offset}", name="getProducts", methods={"GET"})
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param int                 $limit
+     * @param int                 $offset
+     * @return JsonResponse
      */
-    public function showProducts(ManagerRegistry $doctrine): Response
+    public function showProducts(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
-        /* Get all products */
         $products = $doctrine
             ->getRepository(Product::class)
-            ->findAll();
+            ->findBy(
+                [],
+                [],
+                $limit,
+                $offset,
+            );
 
-        if (sizeof($products)>0) {
-            return $this->json([
-                'success' => true,
-                'products' => $products
-            ], 200, [], []);
-        } else {
-            return $this->json([], 204, [], []);
-        }
+        /* Serialisation */
+        $context = SerializationContext::create()->setGroups(['full_product']);
+        $products_json = $serializer->serialize($products, 'json', $context);
+
+        /* Return conditions*/
+        return new JsonResponse($products_json, Response::HTTP_OK, [], true);
     }
 
     /**
-     * @Route("/products/{id}/", name="show_product")
-     * @param ManagerRegistry $doctrine
-     * @return Response
+     * @Route("/api/product/{product}/", name="getProduct", methods={"GET"})
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param int             $product
+     * @return JsonResponse
      */
-    public function showProduct(ManagerRegistry $doctrine, int $id): Response
+    public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, int $product): JsonResponse
     {
         /* Get one product */
         $product = $doctrine
             ->getRepository(Product::class)
             ->findBy(
                 [
-                    'id' => $id
+                    'id' => $product
                 ]
             );
-        if (sizeof($product)>0) {
-            return $this->json([
-                'success' => true,
-                'products' => $product
-            ], 200, [], []);
-        } else {
-            return $this->json([], 204, [], []);
-        }
 
+        /* Serialisation */
+        $context = SerializationContext::create()->setGroups(['full_product']);
+        $product_json = $serializer->serialize($product, 'json', $context);
+
+        /* Return conditions */
+        if (!$product)  {
+            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
+        }
+        return new JsonResponse($product_json, Response::HTTP_OK, [], true);
     }
 }
