@@ -11,15 +11,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientController extends AbstractController
 {
     /**
-     * @Route("/api/company/clients/{limit}/{offset}", name="getClients")
+     * @Route("/api/company/clients/{limit}/{offset}", name="getClients", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
      * @param int                 $limit
@@ -41,17 +38,58 @@ class ClientController extends AbstractController
             );
 
         /* Serialisation */
-        $context = SerializationContext::create()->setGroups(['getClients']);
+        $context = SerializationContext::create()->setGroups(['full_client']);
         $clients_json = $serializer->serialize($clients, 'json', $context);
 
         // TODO : Gestion de la pagination
 
-        /* Return conditions */
-        if (sizeof($clients)>0) {
-            return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
+        return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * @Route("/api/clients/{client}/", name="getClient", methods={"GET"})
+     * @param ManagerRegistry     $doctrine
+     * @param SerializerInterface $serializer
+     * @param int                 $client
+     * @return JsonResponse
+     */
+    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): JsonResponse
+    {
+        /* Get client information */
+        $client = $doctrine
+            ->getRepository(Client::class)
+            ->findOneBy(
+                [
+                    'id' => $client
+                ]
+            )
+        ;
+
+        /* Check if we have 1 client */
+        if (!$client)  {
+            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
         }
 
+        /* Check permission */
+        if ($this->isGranted('detail_client', $client)) {
+
+            /* Serialisation */
+            $context = SerializationContext::create()->setGroups(['full_client']);
+            $client_json = $serializer->serialize($client, 'json', $context);
+
+            /* Return content */
+            return new JsonResponse($client_json, Response::HTTP_OK, [], true);
+
+        } else {
+
+            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+
+        }
+
+
+
     }
+
 
     /**
      * @Route("/api/clients/add/", name="addClient", methods={"POST"})
@@ -82,7 +120,7 @@ class ClientController extends AbstractController
             $entityManager->persist($client);
             $entityManager->flush();
 
-            $context = SerializationContext::create()->setGroups(['getClient']);
+            $context = SerializationContext::create()->setGroups(['full_client']);
             $client_json = $serializer->serialize($client, 'json', $context);
 
             /* Return response */
@@ -95,7 +133,7 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/api/clients/{client}/delete/", name="deleteClient")
+     * @Route("/api/clients/{client}/delete/", name="deleteClient", methods={"POST", "DELETE"})
      * @param ManagerRegistry $doctrine
      * @param int             $client
      * @return JsonResponse
@@ -122,58 +160,13 @@ class ClientController extends AbstractController
             $entityManager->remove($client);
             $entityManager->flush();
 
-            return new JsonResponse("", Response::HTTP_NO_CONTENT, [], true);
+            return new JsonResponse("", Response::HTTP_OK, [], true);
 
         } else {
 
             return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
 
         }
-
-    }
-
-
-    /**
-     * @Route("/api/clients/{client}/", name="getClient")
-     * @param ManagerRegistry     $doctrine
-     * @param SerializerInterface $serializer
-     * @param int                 $client
-     * @return JsonResponse
-     */
-    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): JsonResponse
-    {
-        /* Get client information */
-        $client = $doctrine
-            ->getRepository(Client::class)
-            ->findOneBy(
-                [
-                    'id' => $client
-                ]
-            )
-            ;
-
-        /* Check if we have 1 client */
-        if (!$client)  {
-            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
-        }
-
-        /* Check permission */
-        if ($this->isGranted('detail_client', $client)) {
-
-            /* Serialisation */
-            $context = SerializationContext::create()->setGroups(['getClient']);
-            $client_json = $serializer->serialize($client, 'json', $context);
-
-            /* Return content */
-            return new JsonResponse($client_json, Response::HTTP_OK, [], true);
-
-        } else {
-
-            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
-
-        }
-
-
 
     }
 

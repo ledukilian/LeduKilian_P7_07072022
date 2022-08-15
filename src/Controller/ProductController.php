@@ -9,11 +9,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Services\PaginationService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 class ProductController extends AbstractController
 {
     /**
-     * @Route("/api/products/{limit}/{offset}", name="getProducts")
+     * @Route("/api/products/{limit}/{offset}", name="getProducts", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
      * @param int                 $limit
@@ -22,18 +25,17 @@ class ProductController extends AbstractController
      */
     public function showProducts(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
-        /* Get all products */
         $products = $doctrine
             ->getRepository(Product::class)
             ->findBy(
                 [],
                 [],
                 $limit,
-                $offset
+                $offset,
             );
 
         /* Serialisation */
-        $context = SerializationContext::create()->setGroups(['getProducts']);
+        $context = SerializationContext::create()->setGroups(['full_product']);
         $products_json = $serializer->serialize($products, 'json', $context);
 
         /* Return conditions*/
@@ -41,10 +43,10 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/api/products/{product}/", name="getProduct")
+     * @Route("/api/product/{product}/", name="getProduct", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param int                 $product
+     * @param int             $product
      * @return JsonResponse
      */
     public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, int $product): JsonResponse
@@ -59,7 +61,7 @@ class ProductController extends AbstractController
             );
 
         /* Serialisation */
-        $context = SerializationContext::create()->setGroups(['getProduct']);
+        $context = SerializationContext::create()->setGroups(['full_product']);
         $product_json = $serializer->serialize($product, 'json', $context);
 
         /* Return conditions */
