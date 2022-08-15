@@ -41,8 +41,6 @@ class ClientController extends AbstractController
         $context = SerializationContext::create()->setGroups(['full_client']);
         $clients_json = $serializer->serialize($clients, 'json', $context);
 
-        // TODO : Gestion de la pagination
-
         return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
     }
 
