@@ -85,7 +85,7 @@ nelmio_api_doc:
                                 type: integer
                     responses:
                         '200':
-                            description: 'Produit trouvé et retourné'
+                            description: 'Liste des produits retournée'
                         default:
                             description: 'unexpected error'
 
@@ -123,13 +123,13 @@ nelmio_api_doc:
                         -
                             name: product
                             in: path
-                            description: 'Identifiant du produit à récupérer'
+                            description: 'Identifiant du client à récupérer'
                             required: false
                             schema:
                                 type: integer
                     responses:
                         '200':
-                            description: 'Produit trouvé et retourné'
+                            description: 'Liste des clients retournée'
                         default:
                             description: 'unexpected error'
 
@@ -150,6 +150,8 @@ nelmio_api_doc:
                     responses:
                         '200':
                             description: 'Client trouvé et retourné'
+                        default:
+                            description: 'unexpected error'
             '/api/clients/add/':
                 post:
                     tags:
@@ -158,15 +160,31 @@ nelmio_api_doc:
                     operationId: addClient
                     parameters:
                         -
-                            name: client
-                            in: path
-                            description: 'Identifiant du client à récupérer'
-                            required: false
+                            name: email
+                            in: query
+                            description: 'Email du client à ajouter'
+                            required: true
                             schema:
-                                type: integer
+                                type: string
+                        -
+                            name: firstname
+                            in: query
+                            description: 'Prénom du client à ajouter'
+                            required: true
+                            schema:
+                                type: string
+                        -
+                            name: lastname
+                            in: query
+                            description: 'Nom du client à ajouter'
+                            required: true
+                            schema:
+                                type: string
                     responses:
                         '200':
-                            description: 'Client trouvé et retourné'
+                            description: 'Client ajouté et retourné'
+                        default:
+                            description: 'unexpected error'
             '/api/clients/{client}/delete/':
                 delete:
                     tags:
@@ -177,13 +195,15 @@ nelmio_api_doc:
                         -
                             name: client
                             in: path
-                            description: 'Identifiant du client à récupérer'
+                            description: 'Identifiant du client à supprimer'
                             required: false
                             schema:
                                 type: integer
                     responses:
                         '200':
-                            description: 'Client trouvé et retourné'
+                            description: 'Client supprimé'
+                        default:
+                            description: 'unexpected error'
 
 
     areas:
