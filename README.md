@@ -20,6 +20,11 @@ The project use the **Symfony 6** Framework and **PHP 8.0** or higher. You also 
 
 If needed, you can install *symfony/web-server-bundle* and start the server with `php bin/console server:start`
 
+## 📖️ Documentation
+You can access documentation with the following URI : `/api/doc`
+
+
+
 ## ⚙️ Database
 
 **1.** Create database with `php bin/console doctrine:database:create`
