@@ -69,10 +69,29 @@ nelmio_api_doc:
                     scheme: bearer
                     bearerFormat: JWT
         paths:
+            '/api/login_check':
+                get:
+                    tags:
+                        - Authentification
+                    summary: 'Get a Bearer token'
+                    operationId: login
+                    parameters:
+                        -
+                            name: product
+                            in: path
+                            description: 'Identifiant du produit à récupérer'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Liste des produits retournée'
+                        default:
+                            description: 'unexpected error'
             '/api/products/{limit}/{offset}':
                 get:
                     tags:
-                        - Produits
+                        - Products
                     summary: 'Récupérer la liste des produits'
                     operationId: getProducts
                     parameters:
@@ -92,7 +111,7 @@ nelmio_api_doc:
             '/api/product/{product}/':
                 get:
                     tags:
-                        - Produits
+                        - Products
                     summary: 'Récupérer les informations sur un produit spécifique'
                     operationId: getProduct
                     parameters:
