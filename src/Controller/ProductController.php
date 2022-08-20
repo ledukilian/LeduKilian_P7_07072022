@@ -25,6 +25,10 @@ class ProductController extends AbstractController
      */
     public function showProducts(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
+        $count = $doctrine
+            ->getRepository(Product::class)
+            ->count([]);
+
         $products = $doctrine
             ->getRepository(Product::class)
             ->findBy(
@@ -34,9 +38,26 @@ class ProductController extends AbstractController
                 $offset,
             );
 
+        $data = [
+            'products' => $products,
+            'pages' => []
+        ];
+        if ($offset-$limit>=0) {
+            $data['pages']['previous'] = $this->generateUrl('getProducts', [
+                'limit' => $limit,
+                'offset' => $offset-$limit
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+        if (($offset+$limit)+1<=$count) {
+            $data['pages']['next'] = $this->generateUrl('getProducts', [
+                'limit' => $limit,
+                'offset' => $offset+$limit
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
         /* Serialisation */
         $context = SerializationContext::create()->setGroups(['full_product']);
-        $products_json = $serializer->serialize($products, 'json', $context);
+        $products_json = $serializer->serialize($data, 'json', $context);
 
         /* Return conditions*/
         return new JsonResponse($products_json, Response::HTTP_OK, [], true);
@@ -66,7 +87,7 @@ class ProductController extends AbstractController
 
         /* Return conditions */
         if (!$product)  {
-            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
+            return new JsonResponse(json_encode(["error" => "Cannot find this product."]), Response::HTTP_NOT_FOUND, [], true);
         }
         return new JsonResponse($product_json, Response::HTTP_OK, [], true);
     }
