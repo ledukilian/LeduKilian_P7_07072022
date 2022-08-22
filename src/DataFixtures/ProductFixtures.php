@@ -45,12 +45,33 @@ class ProductFixtures extends Fixture
         $product06->setDescription('Changez votre quotidien en chargeant votre appareil à 100 % en seulement 15 minutes en mode Boost* grâce à l\'HyperCharge 120W ultra-rapide du Redmi Note 11 Pro+ 5G.');
         $product06->setPrice("419.90");
 
+        $product07 = new Product();
+        $product07->setBrand('OnePlus');
+        $product07->setName('OnePlus 10T 5G');
+        $product07->setDescription('e OnePlus 10T 5G est le fleuron de la vitesse qui offre des performances ultimes. ');
+        $product07->setPrice("729.00");
+
+        $product08 = new Product();
+        $product08->setBrand('OnePlus');
+        $product08->setName('Quasiment tout ce que vous attendiez.');
+        $product08->setDescription('');
+        $product08->setPrice("429.00");
+
+        $product09 = new Product();
+        $product09->setBrand('OnePlus');
+        $product09->setName('OnePlus 9 Pro');
+        $product09->setDescription('Your best shot.');
+        $product09->setPrice("919.00");
+
         $manager->persist($product01);
         $manager->persist($product02);
         $manager->persist($product03);
         $manager->persist($product04);
         $manager->persist($product05);
         $manager->persist($product06);
+        $manager->persist($product07);
+        $manager->persist($product08);
+        $manager->persist($product09);
         $manager->flush();
     }
 }

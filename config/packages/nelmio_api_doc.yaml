@@ -1,0 +1,329 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: "Bilemo App"
+            description: "Toute une sélection de téléphones mobiles haut de gamme !"
+            version: "1.0.0"
+        components:
+            schemas:
+                Company:
+                    required:
+                        - id
+                        - email
+                        - roles
+                        - password
+                        - name
+                    properties:
+                        id:
+                            type: integer
+                        email:
+                            type: string
+                        roles:
+                            type: json
+                        password:
+                            type: string
+                        name:
+                            type: string
+                    type: object
+                Product:
+                    required:
+                        - id
+                        - name
+                        - description
+                        - brand
+                        - price
+                    properties:
+                        id:
+                            type: integer
+                        name:
+                            type: string
+                        description:
+                            type: string
+                        brand:
+                            type: string
+                        price:
+                            type: float
+                    type: object
+                Client:
+                    required:
+                        - id
+                        - company_id
+                        - email
+                        - firstname
+                        - lastname
+                    properties:
+                        id:
+                            type: integer
+                        company_id:
+                            type: integer
+                        email:
+                            type: string
+                        firstname:
+                            type: string
+                        lastname:
+                            type: string
+                    type: object
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        paths:
+            '/api/login_check':
+                get:
+                    tags:
+                        - Authentification
+                    summary: Get a token
+                    operationId: login
+                    requestBody:
+                        description: 'Company credentials used to login'
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        username:
+                                            type: string
+                                        password:
+                                            type: string
+                                    example:
+                                        username: ''
+                                        password: ''
+                    responses:
+                        '200':
+                            description: Success
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            token: ''
+                        '400':
+                            description: Server Error
+                        '401':
+                            description: Failed authentification
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            code: 401
+                                            name: 'Invalid credentials'
+            '/api/products/{limit}/{offset}':
+                get:
+                    tags:
+                        - Products
+                    summary: 'Get products list'
+                    operationId: getProducts
+                    parameters:
+                        -
+                            name: limit
+                            in: path
+                            description: 'Number of elements per page (LIMIT)'
+                            required: false
+                            schema:
+                                type: integer
+                        -
+                            name: offset
+                            in: path
+                            description: 'Number of elements skipped (OFFSET)'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: Success
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/Product'
+                                        example:
+                                            products:
+                                                example: example
+                                            pages:
+                                                previous: 'http://localhost:8000/api/products/0/8'
+                                                next: 'http://localhost:8000/api/products/8/8'
+
+            '/api/product/{product}/':
+                get:
+                    tags:
+                        - Products
+                    summary: 'Get product informations'
+                    operationId: getProduct
+                    parameters:
+                        -
+                            name: product
+                            in: path
+                            description: 'Product ID'
+                            required: true
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Product returned'
+                            content:
+                                application/json:
+                                    schema:
+                                        oneOf:
+                                            - { $ref: '#/components/schemas/Product' }
+                        '404':
+                            description: 'Product not found'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            error: 'Cannot find this product.'
+
+
+
+            '/api/clients/{limit}/{offset}':
+                get:
+                    tags:
+                        - Clients
+                    summary: 'Get clients list'
+                    operationId: getClients
+                    parameters:
+                        -
+                            name: limit
+                            in: path
+                            description: 'Number of elements per page (LIMIT)'
+                            required: false
+                            schema:
+                                type: integer
+                        -
+                            name: offset
+                            in: path
+                            description: 'Number of elements skipped (OFFSET)'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: Success
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/Client'
+                                        example:
+                                            clients:
+                                                example: example
+                                            pages:
+                                                previous: 'http://localhost:8000/api/products/0/8'
+                                                next: 'http://localhost:8000/api/products/8/8'
+
+            '/api/client/{client}/':
+                get:
+                    tags:
+                        - Clients
+                    summary: 'Get client informations'
+                    operationId: getClient
+                    requestBody:
+                        description: 'Client to add'
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/Client'
+                    responses:
+                        '200':
+                            description: 'Success'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/Client'
+            '/api/clients/add/':
+                post:
+                    tags:
+                        - Clients
+                    summary: 'Add a new client'
+                    operationId: addClient
+                    requestBody:
+                        description: 'Client informations'
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        email:
+                                            type: string
+                                        firstname:
+                                            type: string
+                                        lastname:
+                                            type: string
+                                    example:
+                                        email: ''
+                                        firstname: 'Anna'
+                                        lastname: 'Spirateur'
+                    responses:
+                        '201':
+                            description: 'Success'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/Client'
+                        '400':
+                            description: 'Bad request'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/Client'
+                                        example:
+                                            errors:
+                                                firstname: 'The first name cannot be blank.'
+            '/api/clients/{client}/delete/':
+                delete:
+                    tags:
+                        - Clients
+                    summary: 'Delete a client'
+                    operationId: deleteClient
+                    parameters:
+                        -
+                            name: client
+                            in: path
+                            description: 'Client ID to delete'
+                            required: false
+                            schema:
+                                type: integer
+                    responses:
+                        '200':
+                            description: 'Success'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            success: 'Client deleted.'
+                        '403':
+                            description: 'Forbidden'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            error: 'You dont have permission to perform this action.'
+                        '404':
+                            description: 'Not found'
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        example:
+                                            error: 'Cannot find this client.'
+
+
+    areas:
+        path_patterns: # an array of regexps (document only routes under /api, except /api/doc)
+            - ^/api(?!/doc$)
+        host_patterns: # document only routes with a host of the form api.*
+            - ^api\.

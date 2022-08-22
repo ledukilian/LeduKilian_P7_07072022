@@ -1,8 +1,10 @@
 App\Entity\Client:
   properties:
     email:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The email cannot be blank.'
+      - NotNull:
+          message: 'The email cannot be null.'
       - Email:
           message: 'The email "{{ value }}" is not a valid email.'
       - Length:
@@ -11,16 +13,20 @@ App\Entity\Client:
           minMessage: 'The email must be at least {{ limit }} characters long'
           maxMessage: 'The email cannot be longer than {{ limit }} characters'
     firstname:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The first name cannot be blank.'
+      - NotNull:
+          message: 'The first name cannot be null.'
       - Length:
           min: 2
           max: 75
           minMessage: 'The first name must be at least {{ limit }} characters long'
           maxMessage: 'The first name cannot be longer than {{ limit }} characters'
     lastname:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The last name cannot be blank.'
+      - NotNull:
+          message: 'The last name cannot be null.'
       - Length:
           min: 2
           max: 75
@@ -30,8 +36,10 @@ App\Entity\Client:
 App\Entity\Company:
   properties:
     email:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The email cannot be blank.'
+      - NotNull:
+          message: 'The email cannot be null.'
       - Email:
           message: 'The email "{{ value }}" is not a valid email.'
       - Length:
@@ -40,16 +48,20 @@ App\Entity\Company:
           minMessage: 'The email must be at least {{ limit }} characters long'
           maxMessage: 'The email cannot be longer than {{ limit }} characters'
     password:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The password cannot be blank.'
+      - NotNull:
+          message: 'The email cannot be null.'
       - Length:
           min: 2
           max: 255
           minMessage: 'The password must be at least {{ limit }} characters long'
           maxMessage: 'The password cannot be longer than {{ limit }} characters'
     name:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The name cannot be blank.'
+      - NotNull:
+          message: 'The name cannot be null.'
       - Length:
           min: 2
           max: 75
@@ -59,30 +71,39 @@ App\Entity\Company:
 App\Entity\Product:
   properties:
     name:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The name cannot be blank.'
+      - NotNull:
+          message: 'The name cannot be null.'
       - Length:
           min: 2
           max: 75
           minMessage: 'The name must be at least {{ limit }} characters long'
           maxMessage: 'The name cannot be longer than {{ limit }} characters'
     description:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The description cannot be blank.'
+      - NotNull:
+          message: 'The description cannot be null.'
       - Length:
           min: 2
           max: 255
           minMessage: 'The description must be at least {{ limit }} characters long'
           maxMessage: 'The description cannot be longer than {{ limit }} characters'
     brand:
-      - NotBlank: ~
-      - NotNull: ~
+      - NotBlank:
+          message: 'The brand cannot be blank.'
+      - NotNull:
+          message: 'The brand cannot be null.'
       - Length:
           min: 2
           max: 75
           minMessage: 'The brand must be at least {{ limit }} characters long'
           maxMessage: 'The brand cannot be longer than {{ limit }} characters'
     price:
-      - NotBlank: ~
-      - NotNull: ~
-      - Positive: ~
+      - NotBlank:
+          message: 'The price cannot be blank.'
+      - NotNull:
+          message: 'The price cannot be null.'
+      - Positive:
+          message: 'The price cannot be negative.'
