@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientController extends AbstractController
@@ -25,6 +26,10 @@ class ClientController extends AbstractController
      */
     public function showClients(ManagerRegistry $doctrine, SerializerInterface $serializer, int $limit = 8, int $offset = 0): JsonResponse
     {
+        $count = $doctrine
+            ->getRepository(Client::class)
+            ->count([]);
+
         /* Get all clients */
         $clients = $doctrine
             ->getRepository(Client::class)
@@ -37,9 +42,26 @@ class ClientController extends AbstractController
                 $offset
             );
 
+        $data = [
+            'clients' => $clients,
+            'pages' => []
+        ];
+        if ($offset-$limit>=0) {
+            $data['pages']['previous'] = $this->generateUrl('getClients', [
+                'limit' => $limit,
+                'offset' => $offset-$limit
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+        if (($offset+$limit)+1<=$count) {
+            $data['pages']['next'] = $this->generateUrl('getClients', [
+                'limit' => $limit,
+                'offset' => $offset+$limit
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
         /* Serialisation */
         $context = SerializationContext::create()->setGroups(['full_client']);
-        $clients_json = $serializer->serialize($clients, 'json', $context);
+        $clients_json = $serializer->serialize($data, 'json', $context);
 
         return new JsonResponse($clients_json, Response::HTTP_OK, [], true);
     }
@@ -65,7 +87,7 @@ class ClientController extends AbstractController
 
         /* Check if we have 1 client */
         if (!$client)  {
-            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
+            return new JsonResponse(json_encode(["error" => "Cannot find this client."]), Response::HTTP_NOT_FOUND, [], true);
         }
 
         /* Check permission */
@@ -80,7 +102,7 @@ class ClientController extends AbstractController
 
         } else {
 
-            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+            return new JsonResponse(json_encode(["error" => "You don't have permission to perform this action."]), Response::HTTP_FORBIDDEN, [], true);
 
         }
 
@@ -102,12 +124,16 @@ class ClientController extends AbstractController
         $client = $serializer->deserialize($request->getContent(), Client::class, "json");
         $client->setCompany($this->getUser());
 
-        $errors = $validator->validate($client);
-
-        if (count($errors) > 0) {
-            $errors = (string) $errors;
+        $violations = $validator->validate($client);
+        $errors = [
+            'errors' => []
+        ];
+        foreach ($violations as $constraint) {
+            $prop = $constraint->getPropertyPath();
+            $errors['errors'][$prop][] = $constraint->getMessage();
+        }
+        if (sizeof($errors)>0) {
             $errors_json = $serializer->serialize($errors, 'json');
-
             return new JsonResponse($errors_json, Response::HTTP_BAD_REQUEST, [], true);
         }
 
@@ -125,13 +151,13 @@ class ClientController extends AbstractController
             return new JsonResponse($client_json, Response::HTTP_CREATED, [], true);
 
         } else {
-            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+            return new JsonResponse(json_encode(["error" => "You don't have permission to perform this action."]), Response::HTTP_FORBIDDEN, [], true);
         }
 
     }
 
     /**
-     * @Route("/api/client/{client}/delete/", name="deleteClient", methods={"POST", "DELETE"})
+     * @Route("/api/client/{client}/delete/", name="deleteClient", methods={"DELETE"})
      * @param ManagerRegistry $doctrine
      * @param int             $client
      * @return JsonResponse
@@ -148,7 +174,7 @@ class ClientController extends AbstractController
             )
         ;
         if (!$client) {
-            return new JsonResponse("", Response::HTTP_NOT_FOUND, [], true);
+            return new JsonResponse(json_encode(["error" => "Cannot find this client."]), Response::HTTP_NOT_FOUND, [], true);
         }
 
         /* Check permission */
@@ -158,11 +184,11 @@ class ClientController extends AbstractController
             $entityManager->remove($client);
             $entityManager->flush();
 
-            return new JsonResponse("", Response::HTTP_OK, [], true);
+            return new JsonResponse(json_encode(["success" => "Client deleted."]), Response::HTTP_OK, [], true);
 
         } else {
 
-            return new JsonResponse("", Response::HTTP_FORBIDDEN, [], true);
+            return new JsonResponse(json_encode(["error" => "You don't have permission to perform this action."]), Response::HTTP_FORBIDDEN, [], true);
 
         }
 
