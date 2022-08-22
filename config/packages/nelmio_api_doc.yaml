@@ -87,8 +87,8 @@ nelmio_api_doc:
                                         password:
                                             type: string
                                     example:
-                                        username: 'example'
-                                        password: 'example'
+                                        username: ''
+                                        password: ''
                     responses:
                         '200':
                             description: Success
@@ -97,7 +97,7 @@ nelmio_api_doc:
                                     schema:
                                         type: object
                                         example:
-                                            token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2NjExNzgzMjksImV4cCI6MTY2MTE5OTkyOSwicm9sZXMiOlsiIiwiUk9MRV9VU0VSIl0sImVtYWlsIjoiYWRtaW5AYi1jb3JwLmZyIn0.Qy4T_LskFdfwzwKUobCKpGzFEJxPPKItRwuoToYA7zCjmyaysPZCy5FFyXx5hlZU0bOX9YZfTDcZcFx24V40wdntdzjegQu65dqbcYDSQApD85sZzcZ-HoKa4OASCqcocalGvC3XREEDg3EzGqlVb-9YVaZMvNfwIk50m0PN-UNFsi59SkQfvltPEnOGYR0z2zzjQZeZac802C-Dik3Rq6sY1lhS28yyigWFU5iLk_zxP_0L642kAczMFitV8IFivn-KMCiKGVem9pRNYQwwYx5RT-R9J8hwNmXlXEzJpxv908iMRUVeXhmfiI7-4opo1XkEWt9B_SKV0u7MJoy8hA'
+                                            token: ''
                         '400':
                             description: Server Error
                         '401':
@@ -258,7 +258,7 @@ nelmio_api_doc:
                                         lastname:
                                             type: string
                                     example:
-                                        email: 'Example'
+                                        email: ''
                                         firstname: 'Anna'
                                         lastname: 'Spirateur'
                     responses:
