@@ -87,8 +87,8 @@ nelmio_api_doc:
                                         password:
                                             type: string
                                     example:
-                                        username: 'example@email.dot'
-                                        password: 'Pa55w0rd'
+                                        username: 'example'
+                                        password: 'example'
                     responses:
                         '200':
                             description: Success
@@ -258,7 +258,7 @@ nelmio_api_doc:
                                         lastname:
                                             type: string
                                     example:
-                                        email: 'example@email.dot'
+                                        email: 'Example'
                                         firstname: 'Anna'
                                         lastname: 'Spirateur'
                     responses:
