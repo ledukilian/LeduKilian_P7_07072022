@@ -72,7 +72,7 @@ class ProductController extends AbstractController
     public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, $product): JsonResponse
     {
         if (!is_numeric($product)) {
-            return new JsonResponse(json_encode(["error" => "The client ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode(["error" => "The product ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
         }
 
         /* Get one product */
