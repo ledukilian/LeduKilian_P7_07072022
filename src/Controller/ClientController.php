@@ -78,7 +78,7 @@ class ClientController extends AbstractController
         if (!is_numeric($client)) {
             return new JsonResponse(json_encode(["error" => "The client ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
         }
-            dd($client);
+
         /* Get client information */
         $client = $doctrine
             ->getRepository(Client::class)
