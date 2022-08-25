@@ -70,11 +70,15 @@ class ClientController extends AbstractController
      * @Route("/api/client/{client}/", name="getClient", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param int                 $client
+     * @param                     $client
      * @return JsonResponse
      */
-    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): JsonResponse
+    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, $client): JsonResponse
     {
+        if (!is_numeric($client)) {
+            return new JsonResponse(json_encode(["error" => "The client ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
+        }
+            dd($client);
         /* Get client information */
         $client = $doctrine
             ->getRepository(Client::class)
