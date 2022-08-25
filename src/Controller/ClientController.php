@@ -184,7 +184,7 @@ class ClientController extends AbstractController
             $entityManager->remove($client);
             $entityManager->flush();
 
-            return new JsonResponse(json_encode(["success" => "Client deleted."]), Response::HTTP_OK, [], true);
+            return new JsonResponse('', Response::HTTP_NO_CONTENT, [], true);
 
         } else {
 
