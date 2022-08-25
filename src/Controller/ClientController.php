@@ -132,7 +132,7 @@ class ClientController extends AbstractController
             $prop = $constraint->getPropertyPath();
             $errors['errors'][$prop][] = $constraint->getMessage();
         }
-        if (sizeof($errors)>0) {
+        if (sizeof($errors['errors'])>0) {
             $errors_json = $serializer->serialize($errors, 'json');
             return new JsonResponse($errors_json, Response::HTTP_BAD_REQUEST, [], true);
         }
