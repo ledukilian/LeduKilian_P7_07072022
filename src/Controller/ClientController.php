@@ -70,11 +70,15 @@ class ClientController extends AbstractController
      * @Route("/api/client/{client}/", name="getClient", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param int                 $client
+     * @param                     $client
      * @return JsonResponse
      */
-    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, int $client): JsonResponse
+    public function showClient(ManagerRegistry $doctrine, SerializerInterface $serializer, $client): JsonResponse
     {
+        if (!is_numeric($client)) {
+            return new JsonResponse(json_encode(["error" => "The client ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
         /* Get client information */
         $client = $doctrine
             ->getRepository(Client::class)
@@ -132,7 +136,7 @@ class ClientController extends AbstractController
             $prop = $constraint->getPropertyPath();
             $errors['errors'][$prop][] = $constraint->getMessage();
         }
-        if (sizeof($errors)>0) {
+        if (sizeof($errors['errors'])>0) {
             $errors_json = $serializer->serialize($errors, 'json');
             return new JsonResponse($errors_json, Response::HTTP_BAD_REQUEST, [], true);
         }
@@ -184,7 +188,7 @@ class ClientController extends AbstractController
             $entityManager->remove($client);
             $entityManager->flush();
 
-            return new JsonResponse(json_encode(["success" => "Client deleted."]), Response::HTTP_OK, [], true);
+            return new JsonResponse('', Response::HTTP_NO_CONTENT, [], true);
 
         } else {
 

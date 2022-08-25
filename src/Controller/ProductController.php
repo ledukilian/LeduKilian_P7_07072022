@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Services\PaginationService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
@@ -67,11 +66,15 @@ class ProductController extends AbstractController
      * @Route("/api/product/{product}/", name="getProduct", methods={"GET"})
      * @param ManagerRegistry     $doctrine
      * @param SerializerInterface $serializer
-     * @param int             $product
+     * @param                     $product
      * @return JsonResponse
      */
-    public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, int $product): JsonResponse
+    public function showProduct(ManagerRegistry $doctrine, SerializerInterface $serializer, $product): JsonResponse
     {
+        if (!is_numeric($product)) {
+            return new JsonResponse(json_encode(["error" => "The product ID provided is not correct."]), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
         /* Get one product */
         $product = $doctrine
             ->getRepository(Product::class)
